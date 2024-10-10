@@ -1,0 +1,162 @@
+Option Explicit
+
+Sub Stock_Tracker()
+
+    ' Create a Loop through different Worksheets
+    Dim WS As Worksheet
+    
+    For Each WS In Worksheets
+        
+        WS.Activate
+    
+            ' Create and format the column headings, etc.
+            Range("I1:Q1").Font.Bold = True
+            Range("I1").Value = "Ticker"
+            Range("J1").Value = "Quarterly Change"
+            Range("K1").Value = "Percent Change"
+            Range("L1").Value = "Total Stock Volume"
+            Range("O2").Value = "Greatest % Increase"
+            Range("O3").Value = "Greatest % Decrease"
+            Range("O4").Value = "Greatest Total Volume"
+            Range("P1").Value = "Ticker"
+            Range("Q1").Value = "Value"
+            Range("J:J").NumberFormat = "0.#0"
+            Range("K:K").NumberFormat = "0.#0%"
+            Range("L:L").NumberFormat = "###,###,###,###,###"
+            Range("Q2").NumberFormat = "0.#0%"
+            Range("Q3").NumberFormat = "0.#0%"
+            Range("Q4").NumberFormat = "###,###,###,###,###"
+            
+            ' Define variables
+            Dim Row As Long
+            Dim Ticker As String
+            Dim TickerCount As Integer
+            Dim TotalVolume As Double
+            Dim TickerOpen As Double
+            Dim TickerClose As Double
+            Dim QuarterlyChange As Double
+            Dim PercentChange As Double
+            Dim MaxPercentChange As Double
+            Dim MinPercentChange As Double
+            Dim MaxTotalVolume As Double
+            
+                ' Set initial values to zero
+                TickerCount = 0
+                MaxPercentChange = 0
+                MinPercentChange = 0
+                MaxTotalVolume = 0
+             
+                
+                ' Loop through the data
+                For Row = 2 To Range("A2").End(xlDown).Row
+                
+                    If Cells(Row, 1).Value <> Ticker Then
+                        Ticker = Cells(Row, 1).Value
+                        TickerOpen = Cells(Row, 3).Value
+                        TotalVolume = 0
+                        TickerCount = TickerCount + 1
+                    End If
+                    
+                    TotalVolume = TotalVolume + Cells(Row, 7).Value
+                    
+                    If Cells(Row + 1, 1).Value <> Ticker Then
+                        TickerClose = Cells(Row, 6).Value
+                        
+                        QuarterlyChange = TickerClose - TickerOpen
+                        PercentChange = QuarterlyChange / TickerOpen
+                        
+                        Cells(TickerCount + 1, 9).Value = Ticker
+                        Cells(TickerCount + 1, 10).Value = QuarterlyChange
+                        Cells(TickerCount + 1, 11).Value = PercentChange
+                        Cells(TickerCount + 1, 12).Value = TotalVolume
+                    
+                        
+                    End If
+                               
+                        ' Create table data for MaxPercent Ticker
+                        
+                        If PercentChange > MaxPercentChange Then
+                            MaxPercentChange = PercentChange
+                            Range("Q2").Value = MaxPercentChange
+                            Range("P2").Value = Ticker
+                        ElseIf PercentChange < MaxPercentChange Then
+                            MaxPercentChange = MaxPercentChange
+                        
+                        End If
+                 
+                        ' Create table data for MinPercent Ticker
+                        
+                        If PercentChange < MinPercentChange Then
+                            MinPercentChange = PercentChange
+                            Range("Q3").Value = MinPercentChange
+                            Range("P3").Value = Ticker
+                        ElseIf PercentChange > MinPercentChange Then
+                            MinPercentChange = MinPercentChange
+                        
+                        End If
+                 
+                        ' Create table data for MaxTotalVolume Ticker
+                        
+                        If TotalVolume >= MaxTotalVolume Then
+                            MaxTotalVolume = TotalVolume
+                            Range("Q4").Value = MaxTotalVolume
+                            Range("P4").Value = Ticker
+                        ElseIf TotalVolume < MaxTotalVolume Then
+                            MaxTotalVolume = MaxTotalVolume
+                        
+                        End If
+                 
+                 
+                        ' Create conditional formatting for Quarterly results
+                               
+                        If QuarterlyChange >= 0 Then
+                            Cells(TickerCount + 1, 10).Interior.ColorIndex = 4
+                        ElseIf QuarterlyChange < 0 Then
+                            Cells(TickerCount + 1, 10).Interior.ColorIndex = 3
+                        
+                        End If
+                 
+                 Next Row
+                
+                ' Loop to create conditional formatting in table results
+                
+                  
+                    
+                ' Create if else statements to find Min and Max values
+                    
+                            
+               
+            ' Freeze panes and apply final column autofit formatting
+    
+        With ActiveWindow
+            If .FreezePanes Then .FreezePanes = False
+                .SplitColumn = 0
+                .SplitRow = 1
+                .FreezePanes = True
+                
+                Range("I:L").Columns.AutoFit
+                Range("O:O").Columns.AutoFit
+                Range("Q:Q").Columns.AutoFit
+               
+            End With
+                
+    Next
+    
+End Sub
+Sub Clear_Contents()
+
+' This Macro will enable you to clear all contents and formatting so you can see the other macro in action.
+
+    ' Create a Loop through different Worksheets
+    Dim WS As Worksheet
+    
+    For Each WS In Worksheets
+        
+        WS.Activate
+
+        Range("I:L").Clear
+        Range("O:Q").Clear
+
+    Next
+
+End Sub
